@@ -1,0 +1,7 @@
+1. Make the script executable.
+
+    chmod +x my_gcloud_script.sh
+
+2. Run the script.
+
+    ./my_gcloud_script.sh
