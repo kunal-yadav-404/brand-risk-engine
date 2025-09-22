@@ -1,0 +1,36 @@
+graph TD
+  subgraph Onboarding_Rail
+    A[Merchant Applications & Documents] -->|Publ/Sub onboarding topic| B(Dataflow ETL)
+    B --> C(BigQuery_Raw_Onboarding)
+    D[Document AI] -->|Extracted fields & validation| B
+    E[Domain/Website Checks] -->|Sanity/blacklist| B
+    C --> F(BigQuery_Onboarding_Features)
+    G(BigQuery ML) --> H(Onboarding_Risk_Score)
+    I[GenAI: Onboarding Rationale] -->|Plain-language rationale| J[Unified Brand Risk Engine]
+    H --> J
+    I --> J
+  end
+
+  subgraph Reputation_Rail
+    K[External Signals: News/Social/Reviews] -->|Pub/Sub reputation topic| L(Dataflow ETL)
+    L --> M(BigQuery_Raw_Reputation)
+    N[Vertex AI NLP: Sentiment/Entities] --> M
+    O[Spike/Anomaly Detection] --> P(Reputation_Risk_Score)
+    Q[GenAI: PR Brief] --> R[Unified Brand Risk Engine]
+    M --> O
+    P --> R
+    Q --> R
+  end
+
+  subgraph Unified_Engine
+    J -->|Store| S[BigQuery: Aggregated_Risk]
+    R --> S
+    S --> T[Looker Studio Dashboards]
+    S --> U[Alerts Slack/Teams]
+    S --> V[Internal APIs for Compliance/PR]
+    J --> W[GenAI Onboarding Explanations] --> S
+    R --> X[GenAI PR Briefs] --> S
+  end
+
+  classDef cloud fill:#e8f0ff,stroke:#0b62a4;
+  class Onboarding_Rail,Reputation_Rail,Unified_Engine cloud;
