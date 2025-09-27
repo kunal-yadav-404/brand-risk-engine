@@ -1,0 +1,19 @@
+{
+  "dashboard_config": {
+    "title": "Brand Risk Engine Dashboard",
+    "pages": [
+      {
+        "name": "Merchant Overview",
+        "charts": ["risk_distribution", "merchant_table", "risk_scorecard"]
+      },
+      {
+        "name": "Reputation Monitor", 
+        "charts": ["sentiment_trends", "mention_sources", "alert_panel"]
+      },
+      {
+        "name": "Unified Risk",
+        "charts": ["combined_scatter", "risk_summary", "brand_health"]
+      }
+    ]
+  }
+}
