@@ -1,5 +1,3 @@
-#!/bin/bash
-
 -- Create dataset
 CREATE SCHEMA `brand_risk_engine`
 OPTIONS(
