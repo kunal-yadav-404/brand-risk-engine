@@ -1,0 +1,277 @@
+Here's the detailed logic and configuration for each chart:
+
+## Page 1: Merchant Risk Overview
+
+### 1. Scorecard: Total Merchants
+```sql
+-- Data Source: merchant_risk_overview
+-- Metric: COUNT(merchant_id)
+-- Filter: None
+SELECT COUNT(DISTINCT merchant_id) as total_merchants
+FROM `brand_risk_engine.merchant_risk_overview`
+```
+
+**Looker Studio Config:**
+- Metric: `merchant_id` (Count Distinct)
+- Style: Large number format
+
+### 2. Pie Chart: Risk Level Distribution
+```sql
+-- Data Source: merchant_risk_overview
+-- Dimension: risk_level
+-- Metric: COUNT(merchant_id)
+SELECT 
+  risk_level,
+  COUNT(merchant_id) as merchant_count
+FROM `brand_risk_engine.merchant_risk_overview`
+GROUP BY risk_level
+```
+
+**Looker Studio Config:**
+- Dimension: `risk_level`
+- Metric: `merchant_id` (Count)
+- Colors: RED (HIGH), ORANGE (MEDIUM), GREEN (LOW)
+
+### 3. Table: Top 10 High Risk Merchants
+```sql
+-- Data Source: merchant_risk_overview
+SELECT 
+  merchant_id,
+  name,
+  website,
+  risk_score,
+  risk_level,
+  explain_text
+FROM `brand_risk_engine.merchant_risk_overview`
+WHERE risk_level = 'HIGH'
+ORDER BY risk_score DESC
+LIMIT 10
+```
+
+**Looker Studio Config:**
+- Dimensions: `merchant_id`, `name`, `website`, `explain_text`
+- Metrics: `risk_score`
+- Sort: `risk_score` DESC
+- Filter: `risk_level` = 'HIGH'
+
+### 4. Bar Chart: Risk Score Distribution
+```sql
+-- Create calculated field for risk score buckets
+CASE 
+  WHEN risk_score >= 0.8 THEN '0.8-1.0'
+  WHEN risk_score >= 0.6 THEN '0.6-0.8'
+  WHEN risk_score >= 0.4 THEN '0.4-0.6'
+  WHEN risk_score >= 0.2 THEN '0.2-0.4'
+  ELSE '0.0-0.2'
+END
+```
+
+**Looker Studio Config:**
+- Dimension: Risk Score Bucket (calculated field above)
+- Metric: `merchant_id` (Count)
+- Sort: By dimension ascending
+
+## Page 2: Reputation Monitoring
+
+### 1. Time Series: Daily Sentiment Trends
+```sql
+-- Data Source: reputation_trends
+SELECT 
+  mention_date,
+  AVG(avg_sentiment) as daily_sentiment
+FROM `brand_risk_engine.reputation_trends`
+GROUP BY mention_date
+ORDER BY mention_date
+```
+
+**Looker Studio Config:**
+- Dimension: `mention_date` (Date)
+- Metric: `avg_sentiment` (Average)
+- Chart type: Line chart
+- Date range: Last 30 days
+
+### 2. Scorecard: Average Sentiment Score
+```sql
+-- Data Source: reputation
+SELECT AVG(sentiment) as overall_sentiment
+FROM `brand_risk_engine.reputation`
+WHERE timestamp >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)
+```
+
+**Looker Studio Config:**
+- Metric: `sentiment` (Average)
+- Filter: Last 30 days
+- Conditional formatting: 
+  - Green: > 0.5
+  - Yellow: 0 to 0.5
+  - Red: < 0
+
+### 3. Table: Recent Mentions by Source
+```sql
+-- Data Source: reputation
+SELECT 
+  source,
+  merchant_id,
+  text,
+  sentiment,
+  timestamp
+FROM `brand_risk_engine.reputation`
+ORDER BY timestamp DESC
+LIMIT 20
+```
+
+**Looker Studio Config:**
+- Dimensions: `source`, `merchant_id`, `text`, `timestamp`
+- Metrics: `sentiment`
+- Sort: `timestamp` DESC
+- Filter: Last 7 days
+
+### 4. Heatmap: Sentiment by Source and Date
+```sql
+-- Create calculated fields
+-- Sentiment Color: 
+CASE 
+  WHEN sentiment >= 0.5 THEN 'Positive'
+  WHEN sentiment >= -0.5 THEN 'Neutral'  
+  ELSE 'Negative'
+END
+
+-- Date Bucket:
+DATE(timestamp)
+```
+
+**Looker Studio Config:**
+- Rows: `source`
+- Columns: Date (calculated field)
+- Metrics: `sentiment` (Average)
+- Color scale: Red (-1) to Green (1)
+
+## Page 3: Combined Risk View
+
+### 1. Scatter Plot: Onboarding Risk vs Reputation Risk
+```sql
+-- Data Source: dashboard_summary
+SELECT 
+  merchant_id,
+  name,
+  onboarding_risk,
+  reputation_risk,
+  combined_risk,
+  risk_level
+FROM `brand_risk_engine.dashboard_summary`
+```
+
+**Looker Studio Config:**
+- X-axis: `onboarding_risk`
+- Y-axis: `reputation_risk`
+- Size: `combined_risk`
+- Color: `risk_level`
+- Tooltip: `merchant_id`, `name`
+
+### 2. Table: Combined Risk Summary
+```sql
+-- Data Source: dashboard_summary
+SELECT 
+  merchant_id,
+  name,
+  onboarding_risk,
+  reputation_risk,
+  combined_risk,
+  risk_level,
+  last_updated
+FROM `brand_risk_engine.dashboard_summary`
+ORDER BY combined_risk DESC
+```
+
+**Looker Studio Config:**
+- All fields as dimensions/metrics
+- Conditional formatting on `combined_risk`:
+  - Red: > 0.7
+  - Orange: 0.4-0.7
+  - Green: < 0.4
+
+### 3. Gauge Chart: Overall Brand Health Score
+```sql
+-- Create calculated field for Brand Health
+-- Brand Health Score = 1 - AVG(combined_risk)
+1 - AVG(combined_risk)
+```
+
+**Looker Studio Config:**
+- Metric: Brand Health Score (calculated field)
+- Min: 0, Max: 1
+- Ranges:
+  - 0-0.5: Red (Critical)
+  - 0.5-0.7: Orange (Warning)
+  - 0.7-1.0: Green (Healthy)
+
+### 4. Alert Panel: High Risk Merchants
+```sql
+-- Create a calculated field for Alert Status
+CASE 
+  WHEN combined_risk >= 0.8 THEN 'CRITICAL'
+  WHEN combined_risk >= 0.6 THEN 'WARNING'
+  ELSE 'OK'
+END
+```
+
+**Looker Studio Config:**
+- Filter: Alert Status = 'CRITICAL' OR 'WARNING'
+- Dimensions: `merchant_id`, `name`, Alert Status
+- Metrics: `combined_risk`
+- Style: Red background for CRITICAL, Orange for WARNING
+
+## Additional Calculated Fields
+
+### Risk Trend (for time-based analysis)
+```sql
+-- Add to views for trend analysis
+WITH risk_history AS (
+  SELECT 
+    merchant_id,
+    combined_risk,
+    last_updated,
+    LAG(combined_risk) OVER (PARTITION BY merchant_id ORDER BY last_updated) as prev_risk
+  FROM `brand_risk_engine.aggregated_risk`
+)
+SELECT 
+  *,
+  CASE 
+    WHEN combined_risk > prev_risk THEN 'INCREASING'
+    WHEN combined_risk < prev_risk THEN 'DECREASING'
+    ELSE 'STABLE'
+  END as risk_trend
+FROM risk_history
+```
+
+### Brand Impact Score
+```sql
+-- Calculated field for overall brand impact
+CASE 
+  WHEN risk_level = 'HIGH' THEN combined_risk * 3
+  WHEN risk_level = 'MEDIUM' THEN combined_risk * 2
+  ELSE combined_risk
+END
+```
+
+## Dashboard Filters
+
+Set up these filters across all pages:
+
+1. **Date Range Filter**: `last_updated`, `timestamp`
+2. **Risk Level Filter**: Multi-select (HIGH, MEDIUM, LOW)
+3. **Merchant Filter**: Search box for `merchant_id` or `name`
+4. **Source Filter**: For reputation data (twitter, news, reviews)
+
+## Auto-Refresh Settings
+
+```json
+{
+  "refresh_schedule": {
+    "frequency": "every_15_minutes",
+    "data_freshness": "real_time"
+  }
+}
+```
+
+This gives you a comprehensive dashboard that updates in near real-time and provides actionable insights for both compliance and PR teams!
