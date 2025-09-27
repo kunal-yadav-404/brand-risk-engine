@@ -7,9 +7,9 @@ bq query --use_legacy_sql=false "
 INSERT INTO \`brand_risk_engine.onboarding\` 
 (merchant_id, name, website, domain_age, contact_info, document_status, verification_score, risk_score, explain_text)
 VALUES 
-('DEMO001', 'Demo Merchant 1', 'https://demo1.com', 365, '{\"email\":\"demo1@test.com\"}', 'verified', 0.8, 0.3, 'Low risk merchant'),
-('DEMO002', 'Demo Merchant 2', 'https://demo2.com', 30, '{\"email\":\"demo2@test.com\"}', 'pending', 0.4, 0.8, 'High risk - new domain'),
-('DEMO003', 'Demo Merchant 3', 'https://demo3.com', 200, '{\"email\":\"demo3@test.com\"}', 'verified', 0.9, 0.1, 'Very low risk merchant')
+('DEMO001', 'Demo Merchant 1', 'https://demo1.com', 365, PARSE_JSON('{\"email\":\"demo1@test.com\"}'), 'verified', 0.8, 0.3, 'Low risk merchant'),
+('DEMO002', 'Demo Merchant 2', 'https://demo2.com', 30, PARSE_JSON('{\"email\":\"demo2@test.com\"}'), 'pending', 0.4, 0.8, 'High risk - new domain'),
+('DEMO003', 'Demo Merchant 3', 'https://demo3.com', 200, PARSE_JSON('{\"email\":\"demo3@test.com\"}'), 'verified', 0.9, 0.1, 'Very low risk merchant')
 "
 
 bq query --use_legacy_sql=false "
