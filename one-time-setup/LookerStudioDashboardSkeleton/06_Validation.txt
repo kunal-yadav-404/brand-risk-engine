@@ -1,0 +1,9 @@
+# Run the setup script
+chmod +x looker_studio_setup.sh
+./looker_studio_setup.sh
+
+# Verify views are created
+bq ls brand_risk_engine
+
+# Test the views
+bq query --use_legacy_sql=false 'SELECT * FROM `brand_risk_engine.merchant_risk_overview` LIMIT 5'
