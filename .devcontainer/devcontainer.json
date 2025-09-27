@@ -1,0 +1,21 @@
+{
+    "name": "My GCP Development Codespace",
+    // Use the Universal Image as a base, as it has many common tools pre-installed.
+    "image": "mcr.microsoft.com/devcontainers/universal:latest",
+    
+    // Add the Google Cloud CLI (gcloud) as a feature
+    "features": {
+        "ghcr.io/devcontainers/features/gcloud-cli:1": {
+            "version": "latest"
+        }
+    }
+
+    // You can also add recommended VS Code extensions here
+    // "customizations": {
+    //     "vscode": {
+    //         "extensions": [
+    //             "googlecloudtools.cloudcode"
+    //         ]
+    //     }
+    // }
+}
