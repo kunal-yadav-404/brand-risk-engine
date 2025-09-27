@@ -1,0 +1,24 @@
+# Test enhanced pipeline with sample data
+gcloud pubsub topics publish onboarding-stream \
+  --message='{
+    "merchant_id":"TEST_ENH_001",
+    "name":"Enhanced Test Merchant",
+    "website":"https://enhanced-test.com",
+    "contact_info":{"email":"contact@enhanced-test.com"},
+    "document_gcs_uri":"gs://brand-risk-documents/test-business-license.pdf"
+  }'
+
+# Check results
+bq query --use_legacy_sql=false '
+SELECT 
+  merchant_id, 
+  name, 
+  risk_score, 
+  explain_text 
+FROM `brand_risk_engine.onboarding` 
+WHERE merchant_id LIKE "TEST_ENH%"'
+
+# Test ML model prediction
+bq query --use_legacy_sql=false '
+SELECT 
+  brand_risk_engine.predict_merchant_risk(0.8, 1.0, 0.9, 1.0, 0.8, 0.7, 0.0, 0.85) as prediction'

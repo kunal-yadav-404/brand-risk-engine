@@ -1,0 +1,11 @@
+# Enable Document AI API
+gcloud services enable documentai.googleapis.com
+
+# Create Document AI processor for business documents
+gcloud alpha documentai processors create \
+  --location=us \
+  --display-name="business-document-processor" \
+  --type="FORM_PARSER_PROCESSOR"
+
+# Note the processor ID for later use
+export DOC_AI_PROCESSOR_ID="your-processor-id"
