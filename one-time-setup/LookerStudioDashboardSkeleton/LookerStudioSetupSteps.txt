@@ -1,0 +1,48 @@
+Looker Studio Setup Steps
+Go to Looker Studio: https://lookerstudio.google.com/
+
+Create New Report:
+
+Click "Create" → "Report"
+Choose "BigQuery" as data source
+Select your project: brand-risk-engine-XXXXX
+Select dataset: brand_risk_engine
+Connect Data Sources:
+
+yaml
+Copy code
+Data Source 1: merchant_risk_overview
+Data Source 2: reputation_trends  
+Data Source 3: dashboard_summary
+Create Dashboard Pages:
+
+Page 1: Merchant Risk Overview
+yaml
+Copy code
+Title: "Brand Risk Engine - Merchant Overview"
+
+Charts to add:
+- Scorecard: Total Merchants
+- Pie Chart: Risk Level Distribution (HIGH/MEDIUM/LOW)
+- Table: Top 10 High Risk Merchants
+- Bar Chart: Risk Score Distribution
+Page 2: Reputation Monitoring
+vbnet
+Copy code
+Title: "Reputation Monitoring Dashboard"
+
+Charts to add:
+- Time Series: Daily Sentiment Trends
+- Scorecard: Average Sentiment Score
+- Table: Recent Mentions by Source
+- Heatmap: Sentiment by Source and Date
+Page 3: Combined Risk View
+yaml
+Copy code
+Title: "Unified Risk Assessment"
+
+Charts to add:
+- Scatter Plot: Onboarding Risk vs Reputation Risk
+- Table: Combined Risk Summary
+- Gauge Chart: Overall Brand Health Score
+- Alert Panel: High Risk Merchants
