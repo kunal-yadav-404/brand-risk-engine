@@ -1,0 +1,34 @@
+# Enable Natural Language API
+gcloud services enable language.googleapis.com
+
+# Test social media simulation
+python -c "
+from social_monitor import SocialMediaSimulator
+import os
+simulator = SocialMediaSimulator(os.environ['GOOGLE_CLOUD_PROJECT'], 'reputation-stream')
+mentions = simulator.generate_social_mentions(3)
+simulator.publish_mentions(mentions)
+print('Published test social mentions')
+"
+
+# Check reputation data
+bq query --use_legacy_sql=false '
+SELECT 
+  merchant_id,
+  source,
+  sentiment,
+  mention_type,
+  text
+FROM `brand_risk_engine.reputation`
+ORDER BY timestamp DESC
+LIMIT 10'
+
+# Test spike detection
+bq query --use_legacy_sql=false '
+SELECT 
+  merchant_id,
+  sentiment_alert,
+  volume_alert,
+  reputation_risk_score
+FROM `brand_risk_engine.sentiment_monitoring`
+WHERE sentiment_alert != "NORMAL" OR volume_alert != "NORMAL_VOLUME"'

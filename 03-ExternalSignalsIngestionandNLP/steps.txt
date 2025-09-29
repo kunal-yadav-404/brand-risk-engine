@@ -1,0 +1,19 @@
+1. External Data Sources Setup
+News API Integration
+# news_ingestion.py
+
+Social Media Simulation (Twitter-like)
+# social_monitor.py
+
+2. Vertex AI NLP Setup
+# nlp_processor.py
+
+3. Enhanced Reputation Pipeline
+# reputation_pipeline_enhanced.py
+
+4. Spike Detection & Anomaly Detection
+sql
+-- Create spike detection view
+
+5. Data Ingestion Orchestration
+# reputation_orchestrator.py
