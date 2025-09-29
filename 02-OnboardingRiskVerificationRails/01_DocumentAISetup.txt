@@ -1,11 +1,29 @@
+# Authenticate and set the project
+gcloud auth login
+gcloud config set project your-gcp-project-id # Please replace with your actual project ID
+
 # Enable Document AI API
 gcloud services enable documentai.googleapis.com
 
+# Grant permissions to the current user to manage Document AI processors
+export USER_EMAIL=$(gcloud config get-value account)
+export PROJECT_ID=$(gcloud config get-value project)
+gcloud projects add-iam-policy-binding ${PROJECT_ID} \
+    --member="user:${USER_EMAIL}" \
+    --role="roles/documentai.editor"
+
 # Create Document AI processor for business documents
-gcloud alpha documentai processors create \
+# and capture the processor ID
+export DOC_AI_PROCESSOR_ID=$(gcloud documentai processors create \
   --location=us \
   --display-name="business-document-processor" \
-  --type="FORM_PARSER_PROCESSOR"
+  --type="FORM_PARSER_PROCESSOR" \
+  --format="value(name)" | awk -F/ '{print $NF}')
 
-# Note the processor ID for later use
-export DOC_AI_PROCESSOR_ID="your-processor-id"
+echo "Created Document AI Processor with ID: ${DOC_AI_PROCESSOR_ID}"
+
+export DOC_AI_PROCESSOR_ID="f2ffe998eaabbe77"
+
+f2ffe998eaabbe77
+
+https://us-documentai.googleapis.com/v1/projects/768479878595/locations/us/processors/f2ffe998eaabbe77:process
