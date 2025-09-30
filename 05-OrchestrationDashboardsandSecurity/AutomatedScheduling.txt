@@ -1,0 +1,16 @@
+# Create Cloud Scheduler jobs
+gcloud scheduler jobs create http orchestrate-risk-pipeline \
+  --schedule="*/15 * * * *" \
+  --uri="https://YOUR-REGION-YOUR-PROJECT.cloudfunctions.net/orchestrate-risk-pipeline" \
+  --http-method=POST \
+  --headers="Content-Type=application/json" \
+  --message-body='{"action":"full_pipeline"}' \
+  --description="Run brand risk pipeline every 15 minutes"
+
+gcloud scheduler jobs create http reputation-monitoring \
+  --schedule="*/5 * * * *" \
+  --uri="https://YOUR-REGION-YOUR-PROJECT.cloudfunctions.net/orchestrate-risk-pipeline" \
+  --http-method=POST \
+  --headers="Content-Type=application/json" \
+  --message-body='{"action":"reputation_check"}' \
+  --description="Check reputation alerts every 5 minutes"

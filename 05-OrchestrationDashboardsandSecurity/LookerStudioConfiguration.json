@@ -1,0 +1,102 @@
+{
+  "dashboard_pages": [
+    {
+      "name": "Executive Summary",
+      "charts": [
+        {
+          "type": "scorecard",
+          "title": "Active High Risk Merchants",
+          "data_source": "enhanced_merchant_overview",
+          "metric": "COUNT(merchant_id)",
+          "filter": "risk_level = 'HIGH'"
+        },
+        {
+          "type": "scorecard", 
+          "title": "Active PR Alerts",
+          "data_source": "pr_dashboard",
+          "metric": "COUNT(alert_id)",
+          "filter": "status = 'ACTIVE'"
+        },
+        {
+          "type": "time_series",
+          "title": "Risk Trend (24h)",
+          "data_source": "aggregated_risk",
+          "dimension": "DATE(last_updated)",
+          "metric": "AVG(combined_risk)"
+        },
+        {
+          "type": "pie_chart",
+          "title": "Risk Distribution",
+          "data_source": "enhanced_merchant_overview",
+          "dimension": "risk_level",
+          "metric": "COUNT(merchant_id)"
+        }
+      ]
+    },
+    {
+      "name": "PR Crisis Management",
+      "charts": [
+        {
+          "type": "table",
+          "title": "Active Alerts",
+          "data_source": "pr_dashboard",
+          "columns": ["merchant_name", "severity", "alert_status", "hours_since_alert", "pr_brief"],
+          "filter": "status = 'ACTIVE'",
+          "sort": "hours_since_alert DESC"
+        },
+        {
+          "type": "gauge",
+          "title": "Crisis Response Time",
+          "data_source": "pr_dashboard",
+          "metric": "AVG(hours_since_alert)",
+          "filter": "status = 'ACTIVE'",
+          "ranges": [
+            {"min": 0, "max": 2, "color": "green"},
+            {"min": 2, "max": 6, "color": "yellow"}, 
+            {"min": 6, "max": 24, "color": "red"}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Merchant Risk Details",
+      "charts": [
+        {
+          "type": "table",
+          "title": "High Risk Merchants",
+          "data_source": "enhanced_merchant_overview",
+          "columns": ["merchant_id", "name", "risk_score", "risk_level", "genai_explanation"],
+          "filter": "risk_level IN ('HIGH', 'MEDIUM')",
+          "sort": "risk_score DESC"
+        },
+        {
+          "type": "scatter_plot",
+          "title": "Risk Correlation",
+          "data_source": "aggregated_risk",
+          "x_axis": "onboarding_risk",
+          "y_axis": "reputation_risk",
+          "size": "combined_risk",
+          "color": "risk_level"
+        }
+      ]
+    },
+    {
+      "name": "System Health",
+      "charts": [
+        {
+          "type": "table",
+          "title": "Pipeline Activity",
+          "data_source": "realtime_monitoring",
+          "columns": ["data_type", "active_merchants", "total_records", "latest_activity"]
+        },
+        {
+          "type": "time_series",
+          "title": "Data Ingestion Rate",
+          "data_source": "reputation",
+          "dimension": "DATETIME_TRUNC(DATETIME(timestamp), HOUR)",
+          "metric": "COUNT(*)"
+        }
+      ]
+    }
+  ]
+}

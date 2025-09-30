@@ -1,0 +1,22 @@
+# Deploy Cloud Function
+gcloud functions deploy orchestrate-risk-pipeline \
+  --runtime=python311 \
+  --trigger=http \
+  --allow-unauthenticated \
+  --service-account=brand-risk-functions@$PROJECT_ID.iam.gserviceaccount.com
+
+# Test orchestration
+curl -X POST https://YOUR-REGION-YOUR-PROJECT.cloudfunctions.net/orchestrate-risk-pipeline \
+  -H "Content-Type: application/json" \
+  -d '{"action":"full_pipeline"}'
+
+# Check updated dashboards
+bq query --use_legacy_sql=false '
+SELECT * FROM `brand_risk_engine.enhanced_merchant_overview` 
+WHERE risk_level = "HIGH" 
+LIMIT 5'
+
+# Verify security
+bq query --use_legacy_sql=false '
+SELECT * FROM `brand_risk_engine.secure_onboarding` 
+LIMIT 3'

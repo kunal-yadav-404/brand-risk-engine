@@ -1,0 +1,17 @@
+# Create encryption keys
+gcloud kms keyrings create brand-risk-keyring \
+  --location=global
+
+gcloud kms keys create brand-risk-key \
+  --location=global \
+  --keyring=brand-risk-keyring \
+  --purpose=encryption
+
+# Apply encryption to storage
+gsutil kms encryption \
+  -k projects/$PROJECT_ID/locations/global/keyRings/brand-risk-keyring/cryptoKeys/brand-risk-key \
+  gs://brand-risk-temp
+
+gsutil kms encryption \
+  -k projects/$PROJECT_ID/locations/global/keyRings/brand-risk-keyring/cryptoKeys/brand-risk-key \
+  gs://brand-risk-documents

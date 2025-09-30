@@ -1,0 +1,32 @@
+# Create specific service accounts for each component
+gcloud iam service-accounts create brand-risk-dataflow \
+  --display-name="Brand Risk Dataflow Service Account"
+
+gcloud iam service-accounts create brand-risk-functions \
+  --display-name="Brand Risk Cloud Functions Service Account"
+
+gcloud iam service-accounts create brand-risk-scheduler \
+  --display-name="Brand Risk Scheduler Service Account"
+
+# Grant minimal required permissions
+# Dataflow permissions
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:brand-risk-dataflow@$PROJECT_ID.iam.gserviceaccount.com" \
+  --role="roles/dataflow.worker"
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:brand-risk-dataflow@$PROJECT_ID.iam.gserviceaccount.com" \
+  --role="roles/bigquery.dataEditor"
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:brand-risk-dataflow@$PROJECT_ID.iam.gserviceaccount.com" \
+  --role="roles/pubsub.subscriber"
+
+# Functions permissions
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:brand-risk-functions@$PROJECT_ID.iam.gserviceaccount.com" \
+  --role="roles/bigquery.dataEditor"
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:brand-risk-functions@$PROJECT_ID.iam.gserviceaccount.com" \
+  --role="roles/aiplatform.user"
