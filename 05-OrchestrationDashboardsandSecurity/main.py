@@ -2,7 +2,7 @@
 import functions_framework
 from google.cloud import pubsub_v1
 from google.cloud import bigquery
-from genai_explainer_fixed import GenAIExplainer
+from genai_explainer import GenAIExplainer
 import json
 import logging
 
