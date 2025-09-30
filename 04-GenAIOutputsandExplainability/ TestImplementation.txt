@@ -1,0 +1,28 @@
+# Test GenAI explanations
+python test_genai.py
+
+# Run batch processing
+python batch_genai_processor.py
+
+# Check results
+bq query --use_legacy_sql=false '
+SELECT 
+  merchant_id,
+  explanation_type,
+  LEFT(generated_text, 100) as explanation_preview,
+  risk_score,
+  created_at
+FROM `brand_risk_engine.genai_explanations`
+ORDER BY created_at DESC'
+
+# Check PR alerts
+bq query --use_legacy_sql=false '
+SELECT 
+  merchant_id,
+  alert_type,
+  LEFT(pr_brief, 100) as brief_preview,
+  severity,
+  status,
+  created_at
+FROM `brand_risk_engine.pr_alerts`
+ORDER BY created_at DESC'

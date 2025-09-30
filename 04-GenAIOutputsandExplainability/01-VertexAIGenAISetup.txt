@@ -1,0 +1,14 @@
+# Enable Vertex AI APIs
+gcloud services enable aiplatform.googleapis.com
+gcloud services enable generativelanguage.googleapis.com
+
+# Set up authentication and permissions
+gcloud auth application-default login
+
+# Create service account for GenAI
+gcloud iam service-accounts create genai-processor \
+  --display-name="GenAI Processor"
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:genai-processor@$PROJECT_ID.iam.gserviceaccount.com" \
+  --role="roles/aiplatform.user"
