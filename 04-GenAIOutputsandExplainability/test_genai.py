@@ -1,4 +1,4 @@
-# test_genai.py
+# test_genai_fixed.py
 import os
 from genai_explainer import GenAIExplainer
 

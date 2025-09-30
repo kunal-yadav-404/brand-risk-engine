@@ -2,6 +2,8 @@
 from genai_explainer import GenAIExplainer
 from google.cloud import bigquery
 import json
+import os
+import time
 
 def process_high_risk_merchants():
     """Generate explanations for high-risk merchants"""
