@@ -1,0 +1,11 @@
+The data is flowing correctly, but there's one issue to fix for the demo:
+
+✅ What's Working:
+Social media mentions are being ingested ✅
+Sentiment analysis is working (scores from -0.7 to 0.8) ✅
+Data is flowing to BigQuery ✅
+⚠️ Issue: "INSUFFICIENT_DATA"
+The spike detection shows "INSUFFICIENT_DATA" because it needs 24+ hours of historical data to establish baselines. Since this is a new system, there's no baseline yet.
+
+Quick Fix for Demo
+Let's adjust the baseline logic to work with limited data:

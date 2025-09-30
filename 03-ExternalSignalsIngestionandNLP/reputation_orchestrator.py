@@ -3,6 +3,9 @@ import time
 from news_ingestion import NewsMonitor
 from social_monitor import SocialMediaSimulator
 
+PROJECT_ID = "brand-risk-engine-1758962489"
+REGION = "us-central1"
+
 class ReputationOrchestrator:
     def __init__(self, project_id):
         self.project_id = project_id

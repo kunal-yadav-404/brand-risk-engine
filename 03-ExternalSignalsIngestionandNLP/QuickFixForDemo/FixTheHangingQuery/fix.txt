@@ -1,0 +1,57 @@
+Fix the Hanging Query
+The reputation_risk_summary query is hanging. Let's create/refresh it:
+
+
+# Create the summary table manually
+bq query --use_legacy_sql=false '
+CREATE OR REPLACE TABLE `brand_risk_engine.reputation_risk_summary` AS
+SELECT 
+  merchant_id,
+  AVG(reputation_risk_score) as avg_reputation_risk,
+  MAX(reputation_risk_score) as max_reputation_risk,
+  COUNT(CASE WHEN sentiment_alert != "NORMAL" THEN 1 END) as alert_count,
+  COUNT(CASE WHEN volume_alert = "VOLUME_SPIKE" THEN 1 END) as volume_spike_count,
+  CURRENT_TIMESTAMP() as last_updated
+FROM `brand_risk_engine.sentiment_monitoring`
+GROUP BY merchant_id'
+
+# Now check the results
+bq query --use_legacy_sql=false '
+SELECT 
+  merchant_id,
+  ROUND(avg_reputation_risk, 2) as avg_reputation_risk,
+  ROUND(max_reputation_risk, 2) as max_reputation_risk,
+  alert_count,
+  volume_spike_count,
+  last_updated
+FROM `brand_risk_engine.reputation_risk_summary`'
+
+Verify NLP Processing
+# Check if enhanced NLP features are working
+bq query --use_legacy_sql=false '
+SELECT 
+  mention_type,
+  language,
+  sentiment,
+  sentiment_raw,
+  magnitude,
+  COUNT(*) as count
+FROM `brand_risk_engine.reputation`
+WHERE mention_type IS NOT NULL
+GROUP BY mention_type, language, sentiment, sentiment_raw, magnitude
+LIMIT 10'
+
+
+View Recent Critical Mentions
+
+# See the negative spike mentions
+bq query --use_legacy_sql=false '
+SELECT 
+  source,
+  sentiment,
+  text,
+  timestamp
+FROM `brand_risk_engine.reputation`
+WHERE sentiment < -0.5
+ORDER BY timestamp DESC
+LIMIT 5'

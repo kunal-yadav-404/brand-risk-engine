@@ -1,0 +1,37 @@
+# Wait 2-3 minutes for processing, then check
+bq query --use_legacy_sql=false '
+SELECT 
+  merchant_id,
+  sentiment_alert,
+  volume_alert,
+  reputation_risk_score,
+  avg_sentiment,
+  mention_count
+FROM `brand_risk_engine.sentiment_monitoring`
+WHERE sentiment_alert != "NORMAL" OR volume_alert != "NORMAL_VOLUME"
+ORDER BY reputation_risk_score DESC'
+
+# Check recent reputation summary
+bq query --use_legacy_sql=false '
+SELECT 
+  merchant_id,
+  avg_reputation_risk,
+  max_reputation_risk,
+  alert_count,
+  volume_spike_count
+FROM `brand_risk_engine.reputation_risk_summary`'
+
+Add Missing NLP Features
+The current data is using simple sentiment simulation. Let's add the actual NLP analysis:
+
+-- Check if NLP fields are populated
+SELECT 
+  mention_type,
+  language,
+  sentiment,
+  sentiment_raw,
+  magnitude,
+  COUNT(*) as count
+FROM `brand_risk_engine.reputation`
+GROUP BY mention_type, language, sentiment, sentiment_raw, magnitude
+LIMIT 10;

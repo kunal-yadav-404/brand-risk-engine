@@ -1,0 +1,35 @@
+# Generate more varied test data to trigger alerts
+python -c "
+from social_monitor import SocialMediaSimulator
+import os
+import time
+
+simulator = SocialMediaSimulator(os.environ['GOOGLE_CLOUD_PROJECT'], 'reputation-stream')
+
+# Generate negative sentiment spike
+negative_posts = [
+    {'text': 'Worldline payment system completely down! This is terrible!', 'sentiment': -0.9},
+    {'text': 'Another Worldline failure today. When will this end?', 'sentiment': -0.8},
+    {'text': 'Worldline is the worst payment processor ever', 'sentiment': -0.7},
+    {'text': 'Worldline security breach reported everywhere', 'sentiment': -0.9},
+    {'text': 'Avoid Worldline at all costs! Terrible service!', 'sentiment': -0.8}
+]
+
+# Generate high volume
+for i in range(5):
+    mentions = []
+    for j, post in enumerate(negative_posts):
+        mention = {
+            'mention_id': f'negative_spike_{i}_{j}',
+            'source': 'twitter',
+            'text': post['text'],
+            'sentiment': post['sentiment'],
+            'timestamp': time.time(),
+            'merchant_id': 'WORLDLINE_GLOBAL'
+        }
+        mentions.append(mention)
+    
+    simulator.publish_mentions(mentions)
+    print(f'Published batch {i+1} of negative mentions')
+    time.sleep(2)  # Small delay between batches
+"
